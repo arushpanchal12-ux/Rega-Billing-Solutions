@@ -1,0 +1,43 @@
+﻿# CodeRabbit Configuration for Rega Billing Solutions
+# Request comprehensive analysis of all files
+
+reviews:
+  request_changes_workflow: true
+  high_level_summary: true
+  poem: true
+  review_status: true
+  collapse_ellipsis: true
+  
+path_filters:
+  - "**/*.java"
+  - "**/*.yml"
+  - "**/*.sql"
+  - "**/*.xml"
+  - "**/*.md"
+
+language_extensions:
+  - java
+  - yaml
+  - sql
+  - xml
+  - markdown
+
+tools:
+  java:
+    enabled: true
+    include_patterns:
+      - "src/**/*.java"
+    review_depth: thorough
+    security_focus: high
+    performance_analysis: true
+    best_practices: true
+    
+checks:
+  - security_vulnerabilities
+  - performance_issues  
+  - code_smells
+  - maintainability
+  - test_coverage
+  - documentation
+  - naming_conventions
+  - error_handling
