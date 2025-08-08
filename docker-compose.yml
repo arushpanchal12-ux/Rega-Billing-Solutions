@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: rega_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rega_password
+      MYSQL_DATABASE: rega_billing_db
+      MYSQL_USER: rega_user
+      MYSQL_PASSWORD: rega_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prega_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  app:
+    build: .
+    container_name: rega_app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: mysql
+      DB_URL: jdbc:mysql://mysql:3306/rega_billing_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USER: rega_user
+      DB_PASSWORD: rega_password
+      JWT_SECRET: rega-super-secret-jwt-key-change-in-production-32bytes-minimum
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3001
+      PAYMENT_PROVIDER: RAZORPAY
+    ports:
+      - "8080:8080"
+    volumes:
+      - app_logs:/app/logs
+
+volumes:
+  mysql_data:
+  app_logs:

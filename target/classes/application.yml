@@ -1,0 +1,119 @@
+server:
+  port: 8080
+  tomcat:
+    max-connections: 20000
+    max-threads: 500
+    min-spare-threads: 50
+
+spring:
+  application:
+    name: rega-billing-solutions
+  
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:regadb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+    driver-class-name: ${DB_DRIVER:org.h2.Driver}
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+      connection-timeout: 30000
+      idle-timeout: 300000
+    
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:create-drop}
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: ${JPA_DIALECT:org.hibernate.dialect.H2Dialect}
+        format_sql: true
+        
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  task:
+    execution:
+      pool:
+        core-size: 10
+        max-size: 50
+        queue-capacity: 100
+    scheduling:
+      pool:
+        size: 10
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:3001}
+    
+  jwt:
+    issuer: "RegaBillingSolutions"
+    access-token-ttl-minutes: 15
+    refresh-token-ttl-days: 7
+    secret: ${JWT_SECRET:dev-secret-change-me-32bytes-minimum-aaaaaaaa}
+    
+  payments:
+    provider: ${PAYMENT_PROVIDER:RAZORPAY}
+    razorpay:
+      key-id: ${RAZORPAY_KEY_ID:rzp_test_xxx}
+      key-secret: ${RAZORPAY_KEY_SECRET:rzp_secret_xxx}
+      webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:rzp_webhook_secret}
+    stripe:
+      public-key: ${STRIPE_PUBLIC_KEY:pk_test_xxx}
+      secret-key: ${STRIPE_SECRET_KEY:sk_test_xxx}
+      webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_xxx}
+
+  # Retargeting System Configuration
+  retargeting:
+    enabled: true
+    max-retargeting-weeks: 4
+    max-weekly-spend: 5000.0
+    max-monthly-spend: 20000.0
+    email-cost: 0.50
+    sms-cost: 3.00
+    
+    optimization:
+      enabled: true
+      personalization: true
+      smart-scheduling: true
+      
+    compliance:
+      unsubscribe-enabled: true
+      tracking-pixels: true
+      click-tracking: true
+      
+  email:
+    sendgrid:
+      api-key: ${SENDGRID_API_KEY:mock-api-key}
+      from-email: ${EMAIL_FROM:noreply@regabilling.com}
+      from-name: "Rega Billing Solutions"
+    mock-mode: ${EMAIL_MOCK_MODE:true}
+    
+  sms:
+    twilio:
+      account-sid: ${TWILIO_ACCOUNT_SID:mock-account-sid}
+      auth-token: ${TWILIO_AUTH_TOKEN:mock-auth-token}
+      from-number: ${TWILIO_FROM_NUMBER:+1234567890}
+    mock-mode: ${SMS_MOCK_MODE:true}
+
+logging:
+  level:
+    com.regabilling: INFO
+    org.springframework.security: WARN
+    org.hibernate: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
